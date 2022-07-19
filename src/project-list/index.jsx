@@ -1,7 +1,7 @@
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
 import React, { useEffect, useState } from "react";
-import { cleanObject } from "../utils";
+import { cleanObject, useDebounce, useMount } from "../utils";
 import * as qs from "qs";
 
 // 定义数据链接
@@ -17,32 +17,31 @@ export const ProjectListScreen = () => {
     personId: "",
   });
 
+  const debounceParam = useDebounce(param, 500);
+
   // 请求结果的列表状态
   const [list, setList] = useState([]);
 
   // 异步请求数据，当param变化的时候
   useEffect(() => {
     // 这里使用qs对对象进行参数化解析 会将对象解析成 key=value&key=value
-    // console.log(`param 后的:${param}`);
-    // console.log(`cleanobject 后的:${cleanObject(param)}`);
-    // console.log(`拼接完成后的:${qs.stringify(cleanObject(param))}`);
-    fetch(`${apiUrl}/projects?${qs.stringify(cleanObject(param))}`).then(
-      async (respone) => {
-        // 当请求数据返回ok的状态的时候
-        if (respone.ok) {
-          setList(await respone.json());
-        }
+    fetch(
+      `${apiUrl}/projects?${qs.stringify(cleanObject(debounceParam))}`
+    ).then(async (respone) => {
+      // 当请求数据返回ok的状态的时候
+      if (respone.ok) {
+        setList(await respone.json());
       }
-    );
-  }, [param]);
+    });
+  }, [debounceParam]);
 
-  useEffect(() => {
+  useMount(() => {
     fetch(`${apiUrl}/users`).then(async (respone) => {
       if (respone.ok) {
         setUsers(await respone.json());
       }
     });
-  }, []);
+  });
 
   return (
     <div>

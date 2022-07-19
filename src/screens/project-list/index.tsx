@@ -1,7 +1,7 @@
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
 import React, { useEffect, useState } from "react";
-import { cleanObject, useDebounce, useMount } from "../utils";
+import { cleanObject, useDebounce, useMount } from "../../utils";
 import * as qs from "qs";
 
 // 定义数据链接
@@ -17,7 +17,7 @@ export const ProjectListScreen = () => {
     personId: "",
   });
 
-  const debounceParam = useDebounce(param, 500);
+  const debounceParam = useDebounce(param, 200);
 
   // 请求结果的列表状态
   const [list, setList] = useState([]);

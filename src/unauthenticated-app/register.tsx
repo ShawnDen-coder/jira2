@@ -1,25 +1,9 @@
 import React, { FormEvent } from "react";
+import { useAuth } from "../context/auth-context";
 
-// 定义数据链接
-const apiUrl = process.env.REACT_APP_API_URL;
-
-export const LoginScreen = () => {
+export const RegisterScreen = () => {
   // 这种类型标注是一个interface的一个快速写法
-  const login = (param: { username: string; password: string }) => {
-    // 这里使用qs对对象进行参数化解析 会将对象解析成 key=value&key=value
-    fetch(`${apiUrl}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(param),
-    }).then(async (respone) => {
-      // 当请求数据返回ok的状态的时候
-      if (respone.ok) {
-        //setList(await respone.json());
-      }
-    });
-  };
+  const { register, user } = useAuth();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // 阻止表单提交的默认行为
@@ -27,7 +11,7 @@ export const LoginScreen = () => {
       .value;
     const password = (event.currentTarget.elements[1] as HTMLInputElement)
       .value;
-    login({ username, password });
+    register({ username, password });
   };
 
   return (
@@ -40,7 +24,7 @@ export const LoginScreen = () => {
         <label htmlFor="password">密码</label>
         <input type="password" id={"password"}></input>
       </div>
-      <button type="submit">登陆</button>
+      <button type="submit">注册</button>
     </form>
   );
 };

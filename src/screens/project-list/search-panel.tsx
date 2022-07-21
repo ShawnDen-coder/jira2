@@ -1,4 +1,5 @@
 import React from "react";
+import { Input, Select } from "antd";
 
 export interface User {
   id: string;
@@ -22,25 +23,23 @@ export const SearchPanel = ({ users, param, setParam }: SearchPanelProps) => {
   return (
     <form>
       <div>
-        <input
+        <Input
           type="text"
           value={param.name}
           onChange={(event) => setParam({ ...param, name: event.target.value })}
-        ></input>
-        <select
+        ></Input>
+        <Select
           value={param.personId}
-          onChange={(event) =>
-            setParam({ ...param, personId: event.target.value })
-          }
+          onChange={(value) => setParam({ ...param, personId: value })}
         >
-          <option value={""}>负责人</option>
+          <Select.Option value={""}>负责人</Select.Option>
           {/* 这里通过循环users的状态生成多个用户的select */}
           {users.map((user) => (
-            <option key={user.id} value={user.id}>
+            <Select.Option key={user.id} value={user.id}>
               {user.name}
-            </option>
+            </Select.Option>
           ))}
-        </select>
+        </Select>
       </div>
     </form>
   );

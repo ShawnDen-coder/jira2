@@ -1,14 +1,13 @@
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
-import React, { useEffect, useState } from "react";
-import { cleanObject, useDebounce, useMount } from "../../utils";
-import { useHttp } from "../../utils/http";
+import React, { useState } from "react";
+import { useDebounce } from "../../utils";
 import styled from "@emotion/styled";
+import { Typography } from "antd";
+import { useProject } from "../../utils/project";
+import { useUsers } from "../../utils/users";
 
 export const ProjectListScreen = () => {
-  // 这个是下拉框的用户选项的状态
-  const [users, setUsers] = useState([]);
-
   // 这个是搜索框的状态
   const [param, setParam] = useState({
     name: "",
@@ -17,29 +16,26 @@ export const ProjectListScreen = () => {
 
   const debounceParam = useDebounce(param, 200);
 
-  // 请求结果的列表状态
-  const [list, setList] = useState([]);
-
-  const client = useHttp();
-
-  // 异步请求数据，当param变化的时候
-  useEffect(() => {
-    client("projects", { data: cleanObject(debounceParam) }).then(setList);
-  }, [debounceParam]);
-
-  useMount(() => {
-    client("users").then(setUsers);
-  });
+  const { isLoading, error, data: list } = useProject(debounceParam);
+  const { data: users } = useUsers();
 
   return (
     <Container>
       <h1>项目列表</h1>
       <SearchPanel
-        users={users}
+        users={users || []}
         param={param}
         setParam={setParam}
       ></SearchPanel>
-      <List users={users} list={list}></List>
+
+      {error ? (
+        <Typography.Text type={"danger"}>{error.message}</Typography.Text>
+      ) : null}
+      <List
+        loading={isLoading}
+        users={users || []}
+        dataSource={list || []}
+      ></List>
     </Container>
   );
 };

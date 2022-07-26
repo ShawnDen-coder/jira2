@@ -1,8 +1,10 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, ReactNode, useContext } from "react";
 import * as auth from "auth-provider";
 import { User } from "../screens/project-list/search-panel";
 import { http } from "utils/http";
 import { useMount } from "../utils";
+import { useAsync } from "../utils/use-async";
+import { FillPageErrorFallback, FullPageLoading } from "../components/lib";
 
 interface AuthForm {
   username: string;
@@ -31,14 +33,30 @@ const AuthContext = createContext<
 AuthContext.displayName = "AuthContext"; // 只是在dev-tool 中用
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const {
+    data: user,
+    error,
+    isLoading,
+    isIdle,
+    isError,
+    run,
+    setData: setUser,
+  } = useAsync<User | null>();
   const login = (form: AuthForm) => auth.login(form).then(setUser);
   const register = (form: AuthForm) => auth.register(form).then(setUser);
   const logout = () => auth.logout().then(() => setUser(null));
 
   useMount(() => {
-    bootstrapUser().then(setUser);
+    run(bootstrapUser());
   });
+
+  if (isIdle || isLoading) {
+    return <FullPageLoading />;
+  }
+
+  if (isError) {
+    return <FillPageErrorFallback error={error} />;
+  }
 
   return (
     <AuthContext.Provider

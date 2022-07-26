@@ -2,13 +2,19 @@ import React from "react";
 import { useAuth } from "../context/auth-context";
 import { Form, Input } from "antd";
 import { LoginButton } from "./index";
+import { useAsync } from "../utils/use-async";
 
-export const LoginScreen = () => {
+export const LoginScreen = ({
+  onError,
+}: {
+  onError: (error: Error) => void;
+}) => {
   // 这种类型标注是一个interface的一个快速写法
   const { login } = useAuth();
+  const { run, isLoading } = useAsync(undefined, { throwOnError: true });
 
   const handleSubmit = (values: { username: string; password: string }) => {
-    login(values);
+    run(login(values)).catch(onError);
   };
 
   return (
@@ -26,7 +32,7 @@ export const LoginScreen = () => {
         <Input placeholder="密码" type="password" id={"password"}></Input>
       </Form.Item>
       <Form.Item>
-        <LoginButton htmlType={"submit"} type="primary">
+        <LoginButton loading={isLoading} htmlType={"submit"} type="primary">
           登陆
         </LoginButton>
       </Form.Item>

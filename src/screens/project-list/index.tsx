@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
 import { Typography } from "antd";
 import { useProject } from "../../utils/project";
 import { useUsers } from "../../utils/users";
+import { useUrlQueryParam } from "../../utils/url";
 
 export const ProjectListScreen = () => {
   // 这个是搜索框的状态
@@ -14,12 +15,14 @@ export const ProjectListScreen = () => {
     personId: "",
   });
 
+  const param = useUrlQueryParam(["name", "personId"]);
   const debounceParam = useDebounce(param, 200);
-
   const { isLoading, error, data: list } = useProject(debounceParam);
   const { data: users } = useUsers();
 
   useDocumentTitle("项目列表", false);
+
+  console.log(useUrlQueryParam(["name"]));
 
   return (
     <Container>
